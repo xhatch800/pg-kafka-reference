@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="003-case-insensitive-department-name" author="sample">
+        <comment>Department names are unique regardless of case; replaces the case-sensitive constraint.</comment>
+        <sql>
+            ALTER TABLE departments DROP CONSTRAINT uk_departments_name;
+
+            CREATE UNIQUE INDEX uk_departments_name_lower ON departments (lower(name));
+        </sql>
+        <rollback>
+            DROP INDEX uk_departments_name_lower;
+
+            ALTER TABLE departments ADD CONSTRAINT uk_departments_name UNIQUE (name);
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

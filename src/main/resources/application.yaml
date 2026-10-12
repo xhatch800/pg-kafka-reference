@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: pg-kafka-reference
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sample
+    username: dev
+    password: welcome1
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        # Fail fast (instead of the 60 s default) when the broker is unreachable.
+        max.block.ms: 5000
+        request.timeout.ms: 5000
+        delivery.timeout.ms: 10000
+    consumer:
+      group-id: sample-terminations
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+        spring.json.trusted.packages: com.example.sample.messaging
+        spring.json.value.default.type: com.example.sample.messaging.EmployeeTerminationEvent
+
+app:
+  kafka:
+    topics:
+      employee-terminations: employee-terminations

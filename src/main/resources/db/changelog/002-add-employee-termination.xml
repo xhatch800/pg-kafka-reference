@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="002-add-employee-termination" author="sample">
+        <sql>
+            ALTER TABLE employees
+                ADD COLUMN status             VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE',
+                ADD COLUMN terminated_at      DATE,
+                ADD COLUMN termination_reason VARCHAR(255);
+
+            ALTER TABLE employees
+                ADD CONSTRAINT ck_employees_status CHECK (status IN ('ACTIVE', 'TERMINATED'));
+        </sql>
+        <rollback>
+            ALTER TABLE employees
+                DROP CONSTRAINT ck_employees_status,
+                DROP COLUMN termination_reason,
+                DROP COLUMN terminated_at,
+                DROP COLUMN status;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

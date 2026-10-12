@@ -1,0 +1,65 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.1.1'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-kafka'
+	implementation 'org.springframework.boot:spring-boot-starter-liquibase'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	runtimeOnly 'org.postgresql:postgresql'
+}
+
+testing {
+	suites {
+		test {
+			useJUnitJupiter()
+			dependencies {
+				implementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+			}
+		}
+
+		integrationTest(JvmTestSuite) {
+			useJUnitJupiter()
+			dependencies {
+				implementation project()
+				implementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+				implementation 'org.springframework.boot:spring-boot-starter-kafka-test'
+				implementation 'org.springframework.boot:spring-boot-starter-liquibase-test'
+				implementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+				implementation 'org.springframework.boot:spring-boot-testcontainers'
+				implementation 'org.testcontainers:testcontainers-junit-jupiter'
+				implementation 'org.testcontainers:testcontainers-kafka'
+				implementation 'org.testcontainers:testcontainers-postgresql'
+				implementation 'org.awaitility:awaitility'
+			}
+			targets {
+				all {
+					testTask.configure {
+						shouldRunAfter(tasks.named('test'))
+					}
+				}
+			}
+		}
+	}
+}
+
+tasks.named('check') {
+	dependsOn(testing.suites.integrationTest)
+}
